@@ -19,9 +19,9 @@ jobs:
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> $GITHUB_ENV
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.2.12479018" || true
-      - name: Install meson and 【entity-ninja¦canonical_name=ninja】
+      - name: Install meson and N
         run: |
-          pip install meson 【entity-ninja¦canonical_name=ninja】
+          pip install meson ninja
           sudo apt-get update && sudo apt-get install -y ninja-build
       - name: Build native libs
         run: chmod +x scripts/build_all.sh && bash scripts/build_all.sh
