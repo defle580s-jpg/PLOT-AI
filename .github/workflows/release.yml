@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 120
     concurrency:
-      group: PLOT-AI-${{ 【entity-github¦canonical_name=GitHub】.ref }}
+      group: PLOT-AI-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
