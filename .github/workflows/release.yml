@@ -23,10 +23,13 @@ jobs:
           echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.1.12297006" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.1.12297006" >> $GITHUB_ENV
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.1.12297006" || true
-      - name: Install meson and N
+      - name: Install all deps at once
         run: |
-          pip install meson ninja
-          sudo apt-get update && sudo apt-get install -y ninja-build
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake pkg-config nasm yasm git ninja-build
+          pip install meson ninja jinja2 mako
+          cmake --version
+          pkg-config --version
       - name: Build native libs
         run: chmod +x scripts/build_all.sh && bash scripts/build_all.sh
       - name: Build APK
