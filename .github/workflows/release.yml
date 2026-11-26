@@ -2,45 +2,54 @@ name: Release PLOT AI
 
 permissions:
   contents: write
-on:
+
+"on":
   workflow_dispatch:
   push:
     tags:
       - 'v*'
+
 jobs:
   build:
     runs-on: ubuntu-22.04
     timeout-minutes: 120
     concurrency:
-      group: PLOT-AI-${{ github.ref }}
+      group: PLOT-AI-${{ 【entity-github¦canonical_name=GitHub】.ref }}
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - uses: gradle/actions/setup-gradle@v3
-      - name: Setup NDK 27.1
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Set up NDK 27.1
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.1.12297006"
+          echo "y" | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;27.1.12297006"
           echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.1.12297006" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.1.12297006" >> $GITHUB_ENV
-          ls $ANDROID_HOME/ndk/
-      - name: Install all deps at once
+          ls "$ANDROID_HOME/ndk/"
+
+      - name: Install native dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake pkg-config nasm yasm git ninja-build
           pip install meson ninja jinja2 mako
+
       - name: Cache native libs
         uses: actions/cache@v4
         with:
@@ -48,23 +57,28 @@ jobs:
           key: plotai-dist-${{ hashFiles('scripts/*.sh') }}
           restore-keys: |
             plotai-dist-
+
       - name: Build native libs
         run: |
           export PKG_CONFIG_SYSTEM_LIBRARY_PATH=""
           export PKG_CONFIG_SYSTEM_INCLUDE_PATH=""
-          export PKG_CONFIG_LIBDIR=$[STRIPPED 86 bytes] CFLAGS="--sysroot=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
+          export PKG_CONFIG_LIBDIR="$GITHUB_WORKSPACE/scripts/dist/arm64-v8a/lib"
+          export CFLAGS="--sysroot=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
           export CPPFLAGS="--sysroot=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/sysroot"
           chmod +x scripts/build_all.sh && bash scripts/build_all.sh
-      - name: Build APK
-        run: gradle assembleRelease --stacktrace
+
+      - name: Build release APK
+        run: ./gradlew assembleRelease --stacktrace
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: PLOT-AI-APK
           path: app/build/outputs/apk/release/*.apk
+
       - name: Create Release
-      uses: softprops/action-gh-release@v2
-      with:
+        uses: softprops/action-gh-release@v2
+        with:
           tag_name: v1.0.9
           name: PLOT AI v1.0.9
           files: app/build/outputs/apk/release/*.apk
