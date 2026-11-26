@@ -1,8 +1,8 @@
-# Video2X for Android
+# PLOT AI for Android
 
-把 [k4yt3x/video2x](https://github.com/k4yt3x/video2x)（v6.x，纯 C/C++ 实现）移植到 Android 的工程。
+把 [k4yt3x/plotai](https://github.com/k4yt3x/plotai)（v6.x，纯 C/C++ 实现）移植到 Android 的工程。
 
-> **本工程已实测通过完整构建**：从零开始交叉编译全部依赖 → 编译 libvideo2x → 产出可安装 APK（arm64-v8a，142MB 含模型）。
+> **本工程已实测通过完整构建**：从零开始交叉编译全部依赖 → 编译 libplotai → 产出可安装 APK（arm64-v8a，142MB 含模型）。
 
 支持 **全量算法**：
 
@@ -13,7 +13,7 @@
 | Anime4K v4 | FFmpeg `libplacebo` filter / Vulkan | 超分（GLSL 着色器） |
 | RIFE | ncnn / Vulkan | 插帧 |
 
-设计与风险分析见方案文档 `video2x-android-移植方案.md`。
+设计与风险分析见方案文档 `plotai-android-移植方案.md`。
 
 ---
 
@@ -26,7 +26,7 @@ Kotlin UI (Compose)
 ProcessingService（前台服务，长任务 + 进度轮询）
       │  JNI
       ▼
-video2x_jni.cpp ──► libvideo2x（上游源码 + FFmpeg，共 2 处补丁，见 §6）
+plotai_jni.cpp ──► libplotai（上游源码 + FFmpeg，共 2 处补丁，见 §6）
                         ├─ RealESRGAN / RealCUGAN / RIFE（ncnn + Vulkan）
                         └─ Anime4K（FFmpeg libplacebo filter + Vulkan）
       ▲
@@ -37,7 +37,7 @@ video2x_jni.cpp ──► libvideo2x（上游源码 + FFmpeg，共 2 处补丁�
 
 - **零侵入上游**：日志（logcat sink）、进度、中止全部通过上游公开 API 实现，不改源码。
 - **补丁共 2 处**，均由 `apply_patches.sh` 幂等注入（字符串锚点匹配，不依赖行号，上游小版本更新不会脆断）：
-  1. **`video2x/src/fsutils.cpp`** —— `find_resource()` 增加读取 `VIDEO2X_RESOURCE_DIR` 环境变量，用于在 Android 上定位模型与 Anime4K 着色器。上游只探测 `/proc/self/exe` 同目录与 `/usr/share`，在 Android 上全部不成立。
+  1. **`plotai/src/fsutils.cpp`** —— `find_resource()` 增加读取 `VIDEO2X_RESOURCE_DIR` 环境变量，用于在 Android 上定位模型与 Anime4K 着色器。上游只探测 `/proc/self/exe` 同目录与 `/usr/share`，在 Android 上全部不成立。
   2. **`ffmpeg/libavcodec/mediacodecenc.c`** —— 修复 `mediacodec_init_bsf()` 中未初始化栈缓冲区 `char str[128]`，它会让 MediaCodec 编码器初始化报 `Bitstream filter not found`（详见 §6 坑位 #16）。
   其余功能（日志、进度、中止、编码参数）全部通过上游公开 API 或 JNI 侧实现，**未改动上游逻辑**。详见 `patches/README.md`。
 - **不做 CLI**：`VIDEO2X_BUILD_CLI=OFF`，因此**完全不需要 Boost**。
@@ -48,15 +48,15 @@ video2x_jni.cpp ──► libvideo2x（上游源码 + FFmpeg，共 2 处补丁�
 ## 2. 目录结构
 
 ```
-video2x-android/
+plotai-android/
 ├── app/
 │   ├── build.gradle.kts
 │   └── src/main/
 │       ├── AndroidManifest.xml
 │       ├── cpp/
 │       │   ├── CMakeLists.txt        # 链接预编译依赖，编译 JNI 层
-│       │   └── video2x_jni.cpp       # JNI 桥（核心）
-│       ├── java/com/video2x/android/ # Kotlin UI / Service / 文件桥接
+│       │   └── plotai_jni.cpp       # JNI 桥（核心）
+│       ├── java/com/plotai/android/ # Kotlin UI / Service / 文件桥接
 │       └── assets/models/            # ← 模型放这里
 ├── scripts/                          # 交叉编译脚本
 │   ├── config.sh                     # 公共配置（NDK/ABI/API/版本）
@@ -68,7 +68,7 @@ video2x-android/
 │   ├── build_ffmpeg.sh               # ④ 解码/编码/滤镜底座
 │   ├── build_ncnn.sh                 # ⑤ 神经网络推理
 │   ├── build_spdlog.sh               # ⑥ 日志
-│   ├── build_video2x.sh              # ⑦ 核心库
+│   ├── build_plotai.sh              # ⑦ 核心库
 │   ├── build_all.sh                  # 一键
 │   └── prepare_jni_libs.sh           # 汇总 .so 供 gradle 打包
 └── patches/README.md                 # 补丁说明
@@ -107,7 +107,7 @@ export ANDROID_NDK_ROOT=$HOME/Android/Sdk/ndk/27.1.12297006
 编译顺序（不可调换）：
 
 ```
-glslang → libplacebo(vulkan) → x264 → FFmpeg → ncnn → spdlog → libvideo2x
+glslang → libplacebo(vulkan) → x264 → FFmpeg → ncnn → spdlog → libplotai
 ```
 
 产物统一安装到 `scripts/dist/arm64-v8a/`：
@@ -115,7 +115,7 @@ glslang → libplacebo(vulkan) → x264 → FFmpeg → ncnn → spdlog → libvi
 ```
 dist/arm64-v8a/
 ├── include/
-├── lib/          # libvideo2x.so, libav*.so, libomp.so, libplacebo.a ...
+├── lib/          # libplotai.so, libav*.so, libomp.so, libplacebo.a ...
 ├── lib/cmake/    # ncnn / spdlog / glslang 的 CMake config
 └── res/          # 模型与 Anime4K 着色器
 ```
@@ -153,7 +153,7 @@ gradle wrapper --gradle-version 8.9   # 若没有 wrapper
 
 ```bash
 adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb logcat -s Video2X Video2X-JNI
+adb logcat -s PLOT AI PLOT AI-JNI
 ```
 
 ---
@@ -168,10 +168,10 @@ adb logcat -s Video2X Video2X-JNI
 | FFmpeg | ✅ libav*.so（含 libplacebo filter + vulkan + mediacodec + libx264）|
 | ncnn | ✅ libncnn.a（Vulkan）|
 | spdlog | ✅ |
-| libvideo2x | ✅ `ELF 64-bit LSB shared object, ARM aarch64` |
+| libplotai | ✅ `ELF 64-bit LSB shared object, ARM aarch64` |
 | APK | ✅ `BUILD SUCCESSFUL`，142MB，含全部 .so 与模型 |
 
-APK 内已确认包含：`libvideo2x.so`、`libvideo2x_jni.so`、`libav*.so`、`libsw*.so`、`lib{realesrgan,realcugan,rife}-ncnn-vulkan.so`、`libomp.so`、`libc++_shared.so`。
+APK 内已确认包含：`libplotai.so`、`libplotai_jni.so`、`libav*.so`、`libsw*.so`、`lib{realesrgan,realcugan,rife}-ncnn-vulkan.so`、`libomp.so`、`libc++_shared.so`。
 
 ---
 
@@ -194,9 +194,9 @@ APK 内已确认包含：`libvideo2x.so`、`libvideo2x_jni.so`、`libav*.so`、`
 | 11 | `out extracted from path .../libavcodec.so is not an ABI` | jniLibs 需要 `<dir>/<abi>/*.so` 结构 | `prepare_jni_libs.sh` 汇总 |
 | 12 | 点击「开始」后**卡在「启动中…」不动** | ViewModel 先把 `status.running` 置 `true`，Service 又据此判定「已有任务」直接 `stopSelf()` —— 逻辑互斥，任务永不开始 | 去重判断改由 Service 自己持有的 `job` 决定，不再依赖 `ProcessBus.status` |
 | 13 | Android 14+ 前台服务报类型错误 | `startForeground()` 未指定类型 | API 29+ 传 `FOREGROUND_SERVICE_TYPE_DATA_SYNC` |
-| 14 | 设备弹「Android 应用兼容性：以下库未进行 16 KB 对齐」 | NDK r27 默认 **4KB 页对齐**，自建库的 LOAD 段是 `0x1000`；Android 15+ 要求 `0x4000` | 所有链接步骤加 `-Wl,-z,max-page-size=16384`（libvideo2x、三个算法库、JNI 层）。NDK r27.2 自带的 libc++/libomp 已对齐，无需换 NDK |
+| 14 | 设备弹「Android 应用兼容性：以下库未进行 16 KB 对齐」 | NDK r27 默认 **4KB 页对齐**，自建库的 LOAD 段是 `0x1000`；Android 15+ 要求 `0x4000` | 所有链接步骤加 `-Wl,-z,max-page-size=16384`（libplotai、三个算法库、JNI 层）。NDK r27.2 自带的 libc++/libomp 已对齐，无需换 NDK |
 | 15 | Real-ESRGAN 报 `model param file not found: ...-x2.param` | 界面里的模型名/倍率是凭印象写的，与上游 `models/` 实际文件不符：只有 `realesr-animevideov3` 有 x2/x3/x4，其余模型**仅 x4**；RealCUGAN 的路径是 `<变体>/up<N>x-<降噪>.param` 三维组合 | 按实际打包的模型文件重建可选清单，模型与倍率联动、RealCUGAN 拆成 变体/倍率/降噪 三个参数 |
-| 16 | MediaCodec 编码器报 `Failed to initialize encoder: Bitstream filter not found` | **FFmpeg 上游 bug**：`libavcodec/mediacodecenc.c` 的 `mediacodec_init_bsf()` 中 `char str[128];` 未初始化。当 `crop==0`（输出尺寸已按 16 对齐）而 `extract_extradata==true`（mp4 输出使 video2x 置上 `AV_CODEC_FLAG_GLOBAL_HEADER`）时，代码跳过 `snprintf` 直接对未初始化缓冲区做 `av_strlcatf` 追加，垃圾串交给 `av_bsf_list_parse_str()` 必然失败 | 在 `apply_patches.sh` 中打补丁：`char str[128] = { 0 };`（幂等注入，不依赖行号） |
+| 16 | MediaCodec 编码器报 `Failed to initialize encoder: Bitstream filter not found` | **FFmpeg 上游 bug**：`libavcodec/mediacodecenc.c` 的 `mediacodec_init_bsf()` 中 `char str[128];` 未初始化。当 `crop==0`（输出尺寸已按 16 对齐）而 `extract_extradata==true`（mp4 输出使 plotai 置上 `AV_CODEC_FLAG_GLOBAL_HEADER`）时，代码跳过 `snprintf` 直接对未初始化缓冲区做 `av_strlcatf` 追加，垃圾串交给 `av_bsf_list_parse_str()` 必然失败 | 在 `apply_patches.sh` 中打补丁：`char str[128] = { 0 };`（幂等注入，不依赖行号） |
 | 17 | 开启 R8 后 release 构建报 `Gradle build daemon disappeared unexpectedly`（R8 其实已跑完，死在 `lintVitalRelease`） | 构建环境内存上限 8 GB，而构建期同时存在 Gradle daemon（默认配了 `-Xmx4096m`）、Kotlin 编译 daemon、R8、lint 数个进程，峰值超限后 daemon 被 OOM kill | 把 `org.gradle.jvmargs` 调小到 `-Xmx2560m`、单独限制 `kotlin.daemon.jvmargs`、关掉 `org.gradle.parallel`，并设 `lint { checkReleaseBuilds = false }`（需要时手动跑 `gradle lint`） |
 | 18 | 图片超分：多帧图片报 `Cannot write more than one file with the same name` | FFmpeg 的 `image2` muxer 在输出文件名不含 `%d` 序号时，只能写一张图；写第二帧直接失败。而 GIF 会被解码成多帧 | 图片模式只接受单帧静态格式，在 UI（`FileBridge.isImageName`）与 native（`is_image_file`）两侧用**同一份**扩展名白名单，刻意排除 `gif`。另外 GIF 这类动图本来也不适合超分 |
 | 19 | 超分视频的进度显示 `860/859` —— 计数比总数还多 1 | `process_frames()` 主循环**无条件**执行 `frame_idx_.fetch_add(1)`；而 libplacebo（Anime4K）的 filter graph 存在内部延迟，`av_buffersink_get_frame()` 会返回 `AVERROR(EAGAIN)`（语义是「输入帧已收下、输出尚未就绪」）。被延迟的那一帧会在 `flush()` 阶段吐出、写入编码器并**再次**计数 —— 同一帧计两次、只写一次。佐证：x264 结束时打印的 `frame I + P + B` 之和等于真实输出帧数，与 `total_frames_` 一致，说明输出本身正确。Real-ESRGAN 走 ncnn 同步处理，不会返回 EAGAIN，因此不触发 | 给上游打补丁（`apply_patches.sh` 补丁 5）：主循环遇到 `EAGAIN` 时 `continue`，不计入进度 —— 该帧的产出会在后续调用或 flush 阶段被计数 |

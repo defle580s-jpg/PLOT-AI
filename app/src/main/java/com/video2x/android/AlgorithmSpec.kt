@@ -11,10 +11,10 @@ enum class Algo(
     /** 需要「插帧倍数」（RIFE） */
     val needsFrameMultiplier: Boolean,
 ) {
-    ANIME4K(Video2XNative.ALGO_ANIME4K, "Anime4K（GLSL 着色器）", true, true, false),
-    REALESRGAN(Video2XNative.ALGO_REALESRGAN, "Real-ESRGAN（ncnn）", true, false, false),
-    REALCUGAN(Video2XNative.ALGO_REALCUGAN, "Real-CUGAN（ncnn）", true, false, false),
-    RIFE(Video2XNative.ALGO_RIFE, "RIFE（插帧）", false, false, true),
+    ANIME4K(PLOT AINative.ALGO_ANIME4K, "Anime4K（GLSL 着色器）", true, true, false),
+    REALESRGAN(PLOT AINative.ALGO_REALESRGAN, "Real-ESRGAN（ncnn）", true, false, false),
+    REALCUGAN(PLOT AINative.ALGO_REALCUGAN, "Real-CUGAN（ncnn）", true, false, false),
+    RIFE(PLOT AINative.ALGO_RIFE, "RIFE（插帧）", false, false, true),
 }
 
 /** 通用选项（编码器 / 着色器 / RIFE 模型） */

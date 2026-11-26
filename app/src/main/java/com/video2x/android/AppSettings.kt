@@ -10,7 +10,7 @@ import android.content.Context
  */
 object AppSettings {
 
-    private const val PREF_NAME = "video2x_settings"
+    private const val PREF_NAME = "plotai_settings"
     private const val KEY_AUTO_CHECK_UPDATE = "auto_check_update"
 
     /** 默认开启：首次安装后启动即检查一次 */

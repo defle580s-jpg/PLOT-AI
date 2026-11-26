@@ -36,11 +36,11 @@ object FileBridge {
 
     fun logDir(): File = File(LOG_DIR).apply { mkdirs() }
 
-    /** 生成带时间戳的日志文件路径：/storage/emulated/0/Video2x/log/video2x_<时间>.log */
+    /** 生成带时间戳的日志文件路径：/storage/emulated/0/Video2x/log/plotai_<时间>.log */
     fun newLogFilePath(): String {
         logDir()  // 确保目录存在，否则 native 侧打开文件会失败
         val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-        return "$LOG_DIR/video2x_$ts.log"
+        return "$LOG_DIR/plotai_$ts.log"
     }
 
     // ------------------------------------------------------------ 权限
@@ -118,7 +118,7 @@ object FileBridge {
 
     /**
      * 文件名是否为单帧静态图片。
-     * 与 native 侧 video2x_jni.cpp 的 is_image_file() 保持一致的集合 ——
+     * 与 native 侧 plotai_jni.cpp 的 is_image_file() 保持一致的集合 ——
      * 刻意排除 gif：多帧输入会让 image2 muxer 在写第二帧时直接失败。
      */
     fun isImageName(name: String?): Boolean {

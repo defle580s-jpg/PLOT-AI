@@ -212,7 +212,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                     // 上游查找的资源名形如 "models/realesrgan/xxx.param"，
                     // 拼接后需要得到 filesDir/models/realesrgan/xxx.param
                     ModelAssets.ensureExtracted(ctx)
-                    Video2XNative.setResourceDir(ctx.filesDir.absolutePath)
+                    PLOT AINative.setResourceDir(ctx.filesDir.absolutePath)
                     null
                 } catch (t: Throwable) {
                     "模型准备失败：${t.message}"
@@ -223,7 +223,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             // 探测 ffmpeg 的 Vulkan 硬件上下文能否创建。失败仅表示要走内置
             // 渲染器（Vulkan 1.1 直连），Anime4K 仍然可用。
             anime4kLibplacebo = withContext(Dispatchers.IO) {
-                runCatching { Video2XNative.probeVulkan() }.getOrDefault(-1) == 0
+                runCatching { PLOT AINative.probeVulkan() }.getOrDefault(-1) == 0
             }
 
             ready = true
@@ -276,10 +276,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         val ctx = getApplication<Application>()
         val inU = inputUri ?: return
 
-        // 把日志切到文本文件：/storage/emulated/0/Video2x/log/video2x_<时间戳>.log
+        // 把日志切到文本文件：/storage/emulated/0/Video2x/log/plotai_<时间戳>.log
         val logPath = FileBridge.newLogFilePath()
         lastLogPath = logPath
-        if (!Video2XNative.setLogFile(logPath)) {
+        if (!PLOT AINative.setLogFile(logPath)) {
             prepareMessage = "日志文件创建失败：$logPath（请检查「所有文件访问」权限）"
         }
 
@@ -314,7 +314,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
         val logPath = FileBridge.newLogFilePath()
         lastLogPath = logPath
-        if (!Video2XNative.setLogFile(logPath)) {
+        if (!PLOT AINative.setLogFile(logPath)) {
             prepareMessage = "日志文件创建失败：$logPath（请检查「所有文件访问」权限）"
         }
 
@@ -499,7 +499,7 @@ private fun MainScreen(vm: MainViewModel = viewModel()) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "Video2X",
+                "PLOT AI",
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.weight(1f),
             )
@@ -529,7 +529,7 @@ private fun MainScreen(vm: MainViewModel = viewModel()) {
             }
         }
         Text(
-            "视频超分 / 插帧（基于 libvideo2x + FFmpeg + ncnn/Vulkan）",
+            "视频超分 / 插帧（基于 libplotai + FFmpeg + ncnn/Vulkan）",
             style = MaterialTheme.typography.bodySmall,
         )
 

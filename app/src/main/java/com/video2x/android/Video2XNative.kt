@@ -3,13 +3,13 @@ package com.video2x.android
 /**
  * JNI 绑定层。
  *
- * native 实现见 app/src/main/cpp/video2x_jni.cpp。
+ * native 实现见 app/src/main/cpp/plotai_jni.cpp。
  * 方法名、参数顺序、类型必须与 C++ 侧的 JNIEXPORT 声明严格一致。
  */
-object Video2XNative {
+object PLOT AINative {
 
     init {
-        System.loadLibrary("video2x_jni")
+        System.loadLibrary("plotai_jni")
     }
 
     // 与 C++ 侧 map_algo() 保持一致
@@ -18,7 +18,7 @@ object Video2XNative {
     const val ALGO_REALCUGAN = 3
     const val ALGO_RIFE = 4
 
-    // 与上游 video2x::VideoProcessorState 保持一致
+    // 与上游 plotai::VideoProcessorState 保持一致
     const val STATE_IDLE = 0
     const val STATE_RUNNING = 1
     const val STATE_PAUSED = 2

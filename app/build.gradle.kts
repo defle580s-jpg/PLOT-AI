@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-// 预编译依赖（FFmpeg / ncnn / libplacebo / glslang / libvideo2x）统一安装在此前缀下，
+// 预编译依赖（FFmpeg / ncnn / libplacebo / glslang / libplotai）统一安装在此前缀下，
 // 由 scripts/build_all.sh 产出。gradle 只做「链接 + 打包」，不负责编译这些大件。
 val depsPrefix = file("${rootProject.projectDir}/scripts/dist/arm64-v8a")
 
@@ -15,7 +15,7 @@ android {
     ndkVersion = "27.1.12297006"
 
     defaultConfig {
-        applicationId = "com.video2x.android"
+        applicationId = "com.plotai.upscaler"
         minSdk = 26
         targetSdk = 35
         versionCode = 21

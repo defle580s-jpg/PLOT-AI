@@ -1,6 +1,6 @@
-# Video2X for Android
+# PLOT AI for Android
 
-> 把 [video2x](https://github.com/k4yt3x/video2x) 搬进 Android 的原生应用 —— 视频超分辨率与插帧，编解码走硬件（MediaCodec），推理走 Vulkan。
+> 把 [plotai](https://github.com/k4yt3x/plotai) 搬进 Android 的原生应用 —— 视频超分辨率与插帧，编解码走硬件（MediaCodec），推理走 Vulkan。
 
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android%208.0%2B%20arm64--v8a-green.svg)](#环境要求)
@@ -11,13 +11,13 @@
 
 ## 这是什么
 
-[video2x](https://github.com/k4yt3x/video2x) 是一个把「放大 / 插帧」做得相当完整的桌面工具。本项目把它整套搬到 Android：
+[plotai](https://github.com/k4yt3x/plotai) 是一个把「放大 / 插帧」做得相当完整的桌面工具。本项目把它整套搬到 Android：
 
 | 层次 | 说明 |
 |---|---|
-| **算法内核** | 直接使用上游的 `libvideo2x`（C/C++）。核心逻辑未改动，仅注入 1 处必要补丁 |
+| **算法内核** | 直接使用上游的 `libplotai`（C/C++）。核心逻辑未改动，仅注入 1 处必要补丁 |
 | **依赖链** | FFmpeg、ncnn、libplacebo、glslang、x264 全部交叉编译为 `arm64-v8a` |
-| **App 层** | JNI 桥 + 前台服务 + Jetpack Compose UI，与 Video2X 桌面版无耦合 |
+| **App 层** | JNI 桥 + 前台服务 + Jetpack Compose UI，与 PLOT AI 桌面版无耦合 |
 
 它不是命令行工具的壳，而是一个完整的 Android 应用：选片、选算法、看进度、导出的流程都在 App 里完成。
 
@@ -85,7 +85,7 @@
 /storage/emulated/0/Video2x/
 ├── 原文件名_算法参数.mp4      ← 成品
 └── log/
-    └── video2x_20261011_185747.log
+    └── plotai_20261011_185747.log
 ```
 
 ### 模型：全部内置，开箱即用
@@ -131,12 +131,12 @@ APK 约 **178 MB**，其中 **约 87% 是模型**：
 ├─────────────────────────────────────────────────────┤
 │  ProcessingService  前台服务 · 进度轮询 · 日志落盘    │
 ├─────────────────────────────────────────────────────┤
-│  Video2XNative  ────────────  JNI 桥                 │
+│  PLOT AINative  ────────────  JNI 桥                 │
 │   ├─ 挂 spdlog sink（写文件）                        │
 │   ├─ setResourceDir()（告诉上游模型在哪）             │
 │   └─ process() / getProcessedFrames() / abort()      │
 ├─────────────────────────────────────────────────────┤
-│  libvideo2x.so（上游核心，1 处补丁）                  │
+│  libplotai.so（上游核心，1 处补丁）                  │
 │   ├─ FFmpeg     解码 / 编码 / 封装 / libplacebo 滤镜  │
 │   ├─ ncnn       Real-ESRGAN · Real-CUGAN · RIFE      │
 │   └─ libplacebo Anime4K（GLSL，走 FFmpeg avfilter）   │
@@ -145,7 +145,7 @@ APK 约 **178 MB**，其中 **约 87% 是模型**：
 
 ### 对上游代码的改动
 
-`video2x/src/fsutils.cpp` 的 `find_resource()`：上游只探测 `/proc/self/exe` 同目录与 `/usr/share`，在 Android 上全部不成立，会导致所有模型「找不到文件」。补丁增加一个由环境变量 `VIDEO2X_RESOURCE_DIR` 指定的候选路径。
+`plotai/src/fsutils.cpp` 的 `find_resource()`：上游只探测 `/proc/self/exe` 同目录与 `/usr/share`，在 Android 上全部不成立，会导致所有模型「找不到文件」。补丁增加一个由环境变量 `VIDEO2X_RESOURCE_DIR` 指定的候选路径。
 
 日志、进度、中止、编码参数等全部通过上游公开 API 或 JNI 侧完成，**未改动上游逻辑**。
 
@@ -165,7 +165,7 @@ APK 约 **178 MB**，其中 **约 87% 是模型**：
 需要 Linux 环境、Android NDK r27c、CMake、Gradle 8.9、以及 `glslang-tools`。
 
 ```bash
-# 1. 交叉编译全部依赖（glslang → libplacebo → x264 → FFmpeg → ncnn → spdlog → libvideo2x）
+# 1. 交叉编译全部依赖（glslang → libplacebo → x264 → FFmpeg → ncnn → spdlog → libplotai）
 cd scripts
 ./fetch_sources.sh      # 拉取源码
 ./build_all.sh          # 编译（耗时较长）
@@ -205,7 +205,7 @@ cd ..
 
 **GNU Affero General Public License v3.0（AGPL-3.0）** —— 见 [LICENSE](LICENSE)。
 
-本项目链接了 video2x 的 `libvideo2x`，而上游以 AGPL-3.0 发布，因此**本项目整体同样以 AGPL-3.0 分发**。这意味着：
+本项目链接了 plotai 的 `libplotai`，而上游以 AGPL-3.0 发布，因此**本项目整体同样以 AGPL-3.0 分发**。这意味着：
 
 - 你可以自由使用、修改、分发
 - 分发时必须**提供完整源码**并保留版权声明
@@ -215,7 +215,7 @@ cd ..
 
 | 组件 | 许可证 | 用途 |
 |---|---|---|
-| [k4yt3x/video2x](https://github.com/k4yt3x/video2x) | AGPL-3.0 | 核心算法库 `libvideo2x` |
+| [k4yt3x/plotai](https://github.com/k4yt3x/plotai) | AGPL-3.0 | 核心算法库 `libplotai` |
 | [FFmpeg](https://ffmpeg.org/) | GPL-2.0+（构建时启用了 `--enable-gpl --enable-libx264`） | 解码 / 编码 / 封装 / 滤镜 |
 | [x264](https://www.videolan.org/developers/x264.html) | GPL-2.0+ | H.264 软编码 |
 | [ncnn](https://github.com/Tencent/ncnn) | BSD-3-Clause | 神经网络推理 |
@@ -229,7 +229,7 @@ cd ..
 
 ## 致谢
 
-- [video2x](https://github.com/k4yt3x/video2x) —— 本项目的一切都建立在它之上
+- [plotai](https://github.com/k4yt3x/plotai) —— 本项目的一切都建立在它之上
 - [ncnn](https://github.com/Tencent/ncnn)、[libplacebo](https://code.videolan.org/videolan/libplacebo)、[FFmpeg](https://ffmpeg.org/) 及其社区
 
 ## 免责声明

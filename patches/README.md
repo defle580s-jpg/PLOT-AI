@@ -2,26 +2,26 @@
 
 本移植**尽量不改动**上游源码。目前共 **2 处**必要改动：
 
-1. [k4yt3x/video2x](https://github.com/k4yt3x/video2x) —— `src/fsutils.cpp` 的资源查找
+1. [k4yt3x/plotai](https://github.com/k4yt3x/plotai) —— `src/fsutils.cpp` 的资源查找
 2. [FFmpeg](https://ffmpeg.org/) —— `libavcodec/mediacodecenc.c` 的未初始化栈缓冲区
 
 两处都由 `scripts/apply_patches.sh` **幂等注入**（字符串锚点匹配，不依赖行号），可重复执行。
 
 ---
 
-## 改动 1：`video2x/src/fsutils.cpp` 的 `find_resource()`
+## 改动 1：`plotai/src/fsutils.cpp` 的 `find_resource()`
 
 **问题：** 上游 `find_resource()` 依次探测以下位置的模型/着色器文件：
 
 1. 传入的路径原样
-2. `$APPDIR/usr/share/video2x/...`（AppImage）
-3. `/usr/local/share/video2x/...`
-4. `/usr/share/video2x/...`
+2. `$APPDIR/usr/share/plotai/...`（AppImage）
+3. `/usr/local/share/plotai/...`
+4. `/usr/share/plotai/...`
 5. `/proc/self/exe` 所在目录
 
 在 Android 上，2/3/4 不存在，5 解析为 `/system/bin`（无意义），1 是相对路径（进程 CWD 为 `/`，不可读）。结果是 **RealESRGAN / RealCUGAN / RIFE 模型与 Anime4K 着色器全部「找不到文件」**。
 
-**解决：** 在候选列表中插入一项——由环境变量 `VIDEO2X_RESOURCE_DIR` 指定的目录。JNI 层（`video2x_jni.cpp` 的 `setResourceDir`）会在启动时把它设为 App 私有目录的**上一级**（`filesDir`），使拼接结果为 `filesDir/models/realesrgan/...`。
+**解决：** 在候选列表中插入一项——由环境变量 `VIDEO2X_RESOURCE_DIR` 指定的目录。JNI 层（`plotai_jni.cpp` 的 `setResourceDir`）会在启动时把它设为 App 私有目录的**上一级**（`filesDir`），使拼接结果为 `filesDir/models/realesrgan/...`。
 
 > 注意：`setResourceDir` 必须传 `filesDir` 而不是 `filesDir/models`，因为上游传入的 `resource` 已经带 `models/` 前缀。多一层会拼成 `models/models/...`。
 
@@ -79,7 +79,7 @@ static int mediacodec_init_bsf(AVCodecContext *avctx)
 
 | 条件 | 来源 | 实际取值 |
 |---|---|---|
-| `extract_extradata == true` | mp4 输出的 muxer 带 `AVFMT_GLOBALHEADER`，video2x 据此置上 `AV_CODEC_FLAG_GLOBAL_HEADER`（`encoder.cpp:169-171`） | 真 |
+| `extract_extradata == true` | mp4 输出的 muxer 带 `AVFMT_GLOBALHEADER`，plotai 据此置上 `AV_CODEC_FLAG_GLOBAL_HEADER`（`encoder.cpp:169-171`） | 真 |
 | `crop_right == 0 && crop_bottom == 0` | 输出尺寸已是 16 的倍数（如 2880×3840） | 真 |
 
 两者叠加 → 走「跳过 `snprintf`、直接对未初始化缓冲区追加」的路径 → 编码器初始化失败，报 **`Bitstream filter not found`**（即 `AVERROR_BSF_NOT_FOUND`）。

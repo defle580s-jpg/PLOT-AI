@@ -12,7 +12,7 @@ import java.io.File
  *   models/libplacebo/<shader>.glsl
  *   models/rife/<name>.param|.bin
  *
- * 解压完成后通过 Video2XNative.setResourceDir(filesDir/models) 告知 native 层。
+ * 解压完成后通过 PLOT AINative.setResourceDir(filesDir/models) 告知 native 层。
  */
 object ModelAssets {
 

@@ -38,7 +38,7 @@ sealed interface UpdateCheckResult {
  */
 object UpdateChecker {
 
-    const val REPO_SLUG = "peanutandwine/video2x-android"
+    const val REPO_SLUG = "defle580s-jpg/PLOT-AI"
     const val REPO_URL = "https://github.com/$REPO_SLUG"
 
     private const val LATEST_API = "https://api.github.com/repos/$REPO_SLUG/releases/latest"
@@ -120,7 +120,7 @@ object UpdateChecker {
                 connectTimeout = 8_000
                 readTimeout = 8_000
                 setRequestProperty("Accept", "application/vnd.github+json")
-                setRequestProperty("User-Agent", "Video2X-Android")
+                setRequestProperty("User-Agent", "PLOT AI-Android")
             }
             val code = conn.responseCode
             if (code !in 200..299) error("服务器返回 HTTP $code")

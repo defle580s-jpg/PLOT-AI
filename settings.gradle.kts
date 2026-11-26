@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Video2X"
+rootProject.name = "PLOT-AI"
 include(":app")

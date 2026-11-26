@@ -99,7 +99,7 @@ class ProcessingService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_ABORT) {
-            Video2XNative.abort()
+            PLOT AINative.abort()
             return START_NOT_STICKY
         }
 
@@ -216,7 +216,7 @@ class ProcessingService : Service() {
                 if (req.transform != 0) {
                     // 旋转 / 翻转：纯软件编码（libx264），规避 GPU 卡死。
                     // 码率填 0 时原生层走 CRF（VBR 质量优先），自动缩减体积。
-                    Video2XNative.rotateVideo(
+                    PLOT AINative.rotateVideo(
                         inFile.absolutePath,
                         outFile.absolutePath,
                         req.transform,
@@ -228,7 +228,7 @@ class ProcessingService : Service() {
                     // Adreno 650 驱动）上无法走 ffmpeg 的 libplacebo 滤镜，
                     // 改由内置的 Vulkan 1.1 渲染器直接执行同一份 shader。
                     val useDirectRenderer =
-                        req.algo == Algo.ANIME4K && Video2XNative.probeVulkan() != 0
+                        req.algo == Algo.ANIME4K && PLOT AINative.probeVulkan() != 0
                     if (useDirectRenderer) {
                         val shaderFile =
                             File(ctx.filesDir, "models/libplacebo/${req.shader}.glsl")
@@ -237,7 +237,7 @@ class ProcessingService : Service() {
                             "[app] anime4k: libplacebo 不可用（缺 Vulkan 1.2），" +
                                 "改用内置 Vulkan 1.1 渲染器: ${shaderFile.absolutePath}",
                         )
-                        Video2XNative.processAnime4K(
+                        PLOT AINative.processAnime4K(
                             inFile.absolutePath,
                             outFile.absolutePath,
                             shaderFile.absolutePath,
@@ -248,7 +248,7 @@ class ProcessingService : Service() {
                             req.isImage,
                         )
                     } else {
-                        Video2XNative.process(
+                        PLOT AINative.process(
                             inFile.absolutePath,
                             outFile.absolutePath,
                             req.algo.id,
@@ -277,8 +277,8 @@ class ProcessingService : Service() {
             var finalTotal = 0L
 
             while (worker.isActive) {
-                val p = Video2XNative.getProcessedFrames()
-                val t = Video2XNative.getTotalFrames()
+                val p = PLOT AINative.getProcessedFrames()
+                val t = PLOT AINative.getTotalFrames()
                 if (p > 0) finalFrames = p
                 if (t > 0) finalTotal = t
                 val frac = if (t > 0) p.toFloat() / t.toFloat() else 0f
@@ -598,7 +598,7 @@ class ProcessingService : Service() {
 
     companion object {
         const val ACTION_ABORT = "com.video2x.android.action.ABORT"
-        private const val CHANNEL_ID = "video2x_process"
+        private const val CHANNEL_ID = "plotai_process"
         private const val NOTIF_ID = 1001
 
         /** 硬件编码器的常见分辨率上限；超出后 MediaCodec 会 configure 失败(-10000) */

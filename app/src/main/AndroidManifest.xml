@@ -24,14 +24,14 @@
         android:version="0x400003" />
 
     <application
-        android:name=".Video2XApp"
+        android:name=".PLOT AIApp"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Video2X"
+        android:theme="@style/Theme.PLOT AI"
         tools:targetApi="35">
 
         <activity

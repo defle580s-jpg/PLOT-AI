@@ -12,14 +12,14 @@ object NativeState {
     var error: String? = null
 }
 
-class Video2XApp : Application() {
+class PLOT AIApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
         try {
             // 挂载 logcat 日志。之后 native 侧与 FFmpeg 的日志都会出现在 logcat 中。
-            Video2XNative.initLogger("Video2X")
-            Video2XNative.setLogLevel("info")
+            PLOT AINative.initLogger("PLOT AI")
+            PLOT AINative.setLogLevel("info")
             NativeState.ready = true
         } catch (t: Throwable) {
             // 例如设备缺少 Vulkan，或 native 库加载失败
@@ -29,6 +29,6 @@ class Video2XApp : Application() {
     }
 
     private companion object {
-        const val TAG = "Video2X"
+        const val TAG = "PLOT AI"
     }
 }
