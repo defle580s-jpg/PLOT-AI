@@ -20,7 +20,7 @@ jobs:
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> $GITHUB_ENV
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.2.12479018" || true
       - name: Build APK
-        run: chmod +x gradlew && ./gradlew assembleRelease --stacktrace
+        run: gradle assembleRelease --stacktrace
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
