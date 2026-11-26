@@ -15,9 +15,9 @@ clone() {
   fi
   log "clone $name ..."
   if [ -n "$ref" ]; then
-    git clone --depth 1 --branch "$ref" "$url" "$name"
+    git clone --depth 1 --recurse-submodules --shallow-submodules --branch "$ref" "$url" "$name"
   else
-    git clone --depth 1 "$url" "$name"
+    git clone --depth 1 --recurse-submodules --shallow-submodules "$url" "$name"
   fi
 }
 
