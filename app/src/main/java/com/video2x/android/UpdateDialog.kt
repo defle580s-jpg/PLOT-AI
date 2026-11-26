@@ -60,13 +60,13 @@ fun UpdateDialog(
                 runCatching {
                     context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(info.pageUrl)))
                 }
-            }) { Text("更新") }
+            }) { Text("Update") }
         },
         dismissButton = {
             TextButton(onClick = {
                 if (dontRemindAgain) AppSettings.setAutoCheckUpdate(context, false)
                 onDismiss()
-            }) { Text("跳过") }
+            }) { Text("Skip") }
         },
     )
 }

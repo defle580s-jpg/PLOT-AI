@@ -437,7 +437,7 @@ private fun MainScreen(vm: MainViewModel = viewModel()) {
             type = "*/*"
         }
         try {
-            inputPicker.launch(Intent.createChooser(inner, "选择图片或视频"))
+            inputPicker.launch(Intent.createChooser(inner, "Select Image or Video"))
         } catch (_: Exception) {
             pickVideoSystem()
         }
@@ -512,14 +512,14 @@ private fun MainScreen(vm: MainViewModel = viewModel()) {
                     onDismissRequest = { showMenu = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text("设置") },
+                        text = { Text("Settings") },
                         onClick = {
                             showMenu = false
                             showSettings = true
                         },
                     )
                     DropdownMenuItem(
-                        text = { Text("视频旋转") },
+                        text = { Text("Video Rotation") },
                         onClick = {
                             showMenu = false
                             showRotate = true
@@ -746,12 +746,12 @@ private fun MainScreen(vm: MainViewModel = viewModel()) {
                 onClick = { vm.start(outputPath) },
                 enabled = vm.ready && vm.permGranted && !status.running && vm.inputUri != null
                     && NativeState.ready,
-            ) { Text("开始") }
+            ) { Text("Start") }
 
             OutlinedButton(
                 onClick = { vm.abort() },
                 enabled = status.running,
-            ) { Text("中止") }
+            ) { Text("Stop") }
         }
 
         if (status.running || status.done) {

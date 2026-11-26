@@ -126,8 +126,8 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("设置", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
-            OutlinedButton(onClick = onBack) { Text("返回") }
+            Text("Settings", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+            OutlinedButton(onClick = onBack) { Text("Back") }
         }
 
         HorizontalDivider()
@@ -175,7 +175,7 @@ fun SettingsScreen(
                         },
                         enabled = !importing,
                     ) {
-                        Text("删除")
+                        Text("Delete")
                     }
                 }
             }
@@ -204,7 +204,7 @@ fun SettingsScreen(
         HorizontalDivider()
 
         // ---------------------------------------------------------- 更新
-        Text("更新", style = MaterialTheme.typography.titleMedium)
+        Text("Update", style = MaterialTheme.typography.titleMedium)
         Text("当前版本：$currentVersion", style = MaterialTheme.typography.bodySmall)
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -288,7 +288,7 @@ fun SettingsScreen(
         HorizontalDivider()
 
         // -------------------------------------------------------------- 关于
-        Text("关于", style = MaterialTheme.typography.titleMedium)
+        Text("About", style = MaterialTheme.typography.titleMedium)
         Text("版本：$currentVersion", style = MaterialTheme.typography.bodySmall)
         Text(
             "模型目录：${ModelAssets.modelsDir(context).absolutePath}",

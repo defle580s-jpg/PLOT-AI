@@ -96,11 +96,11 @@ fun RotationScreen(onBack: () -> Unit) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                "视频旋转",
+                "Video Rotation",
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.weight(1f),
             )
-            OutlinedButton(onClick = onBack) { Text("返回") }
+            OutlinedButton(onClick = onBack) { Text("Back") }
         }
 
         HorizontalDivider()
@@ -171,7 +171,7 @@ fun RotationScreen(onBack: () -> Unit) {
             OutlinedButton(
                 onClick = { vm.abort() },
                 enabled = status.running,
-            ) { Text("中止") }
+            ) { Text("Stop") }
         }
 
         if (status.running || status.done) {
