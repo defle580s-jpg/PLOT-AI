@@ -122,3 +122,9 @@ if [ -f "$PC" ] && ! grep -q -- '-lc++' "$PC"; then
 fi
 
 log "libplacebo 安装到 $PREFIX"
+PC="$PREFIX/lib/pkgconfig/libplacebo.pc"
+if [ -f "$PC" ]; then
+  sed -i 's/^Requires.private:.*$/Requires.private: vulkan/' "$PC"
+  sed -i 's/^Requires:.*$/Requires: vulkan/' "$PC"
+  echo "patched libplacebo.pc Requires to vulkan only"
+fi
